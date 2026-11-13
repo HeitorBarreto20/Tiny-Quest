@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Entrar · TinyQuest{% endblock %}
+{% block content %}
+<form class="card form" method="post" autocomplete="on">
+  <h1>Entrar</h1>
+  <label>Usuário ou e-mail
+    <input name="identifier" value="{{ identifier or '' }}" required autofocus>
+  </label>
+  <label>Senha
+    <input name="password" type="password" required>
+  </label>
+  <button class="btn" type="submit">Entrar</button>
+  <p class="muted">Não tem conta? <a href="{{ url_for('register') }}">Criar conta</a></p>
+</form>
+{% endblock %}

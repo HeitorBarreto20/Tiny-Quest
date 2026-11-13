@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Memória Avançada · TinyQuest{% endblock %}
+{% block content %}
+<section class="mem" id="mem">
+  <h1>Memória Avançada</h1>
+  <p class="muted">Memorize os emojis e suas posições. Depois, coloque cada um no lugar certo.</p>
+  <button class="btn btn-ghost btn-sm" type="button" data-open="tuto">Como jogar</button>
+
+  <div class="rhud">
+    <div class="phase" id="phase">Fase 1 de 3</div>
+    <div class="hits" id="hits" aria-label="Erros"></div>
+  </div>
+
+  <div class="memstat" id="memstat" role="status"><span id="stattext"></span><div class="tbar" id="lookbar"><i id="lookfill"></i></div></div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <div class="mwrap"><div id="mboard" class="mboard"></div></div>
+
+  <div class="mtray" id="mtray" aria-label="Objetos para posicionar"></div>
+  <div class="ractions">
+    <button id="check" class="btn" type="button" disabled>Conferir</button>
+    <button id="clear" class="btn btn-ghost" type="button">Limpar</button>
+  </div>
+
+  <div id="endbox" class="endbox" hidden>
+    <p id="endmsg"></p>
+    <button id="again" class="btn" type="button">Jogar de novo</button>
+    {% if not g.user %}
+    <p class="muted"><a href="{{ url_for('login') }}">Entre</a> ou <a href="{{ url_for('register') }}">crie uma conta</a> para guardar seus pontos e estatísticas.</p>
+    {% endif %}
+  </div>
+</section>
+
+<dialog id="tuto" class="modal">
+  <form method="dialog"><button class="x" aria-label="Fechar">&times;</button></form>
+  <h2>Como jogar Memória Avançada</h2>
+  <ol>
+    <li>Aparece um tabuleiro com alguns <b>emojis</b>. Você tem <b>{{ look_time }} segundos</b> para memorizar quais são e <b>onde estão</b>.</li>
+    <li>Depois os emojis somem. <b>Arraste</b> cada emoji da lista até a casa onde ele estava (também dá para tocar no emoji e depois na casa). Arraste um emoji já colocado para mudá-lo de lugar, ou solte-o fora do tabuleiro para tirá-lo.</li>
+    <li>Com todos posicionados, aperte <b>Conferir</b>.</li>
+    <li>Se errar, conta <b>1 erro</b> e você vê o tabuleiro de novo por mais {{ look_time }} segundos para tentar a <b>mesma fase</b> outra vez. Quem erra no médio não volta para o fácil.</li>
+    <li>São <b>3 fases</b>: fácil (3x3, 3 emojis), médio (4x4, 4 emojis) e difícil (5x5, 5 emojis). Os erros se acumulam. Com <b>{{ max_errors }} erros</b> você perde.</li>
+  </ol>
+  <h3>Pontuação</h3>
+  <table class="ptable">
+    <tr><td>Nenhum erro</td><td>100 pts</td></tr>
+    <tr><td>1 erro</td><td>75 pts</td></tr>
+    <tr><td>2 erros</td><td>50 pts</td></tr>
+    <tr><td>3 erros</td><td>25 pts</td></tr>
+    <tr><td>4 erros (derrota)</td><td>0 pts</td></tr>
+  </table>
+  <p class="muted">Os pontos só são guardados para quem tem conta.</p>
+</dialog>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='memoria.js') }}"></script>{% endblock %}

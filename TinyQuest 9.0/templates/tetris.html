@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Tetris · TinyQuest{% endblock %}
+{% block content %}
+<section class="tetris" id="tetris">
+  <h1>Tetris</h1>
+  <p class="muted">Encaixe as peças, complete linhas e colunas e faça o máximo de pontos.</p>
+  <button class="btn btn-ghost btn-sm" type="button" data-open="tuto">Como jogar</button>
+
+  <div class="thud">
+    <div class="tscore">
+      <span>Pontos</span>
+      <b id="points">0</b>
+      <em id="tier"></em>
+    </div>
+    <div class="tright">
+      <div class="tlines"><span>Linhas</span><b id="lines">0</b></div>
+    </div>
+  </div>
+
+  <div class="timer" id="timer">
+    <b id="time">{{ limit // 60 }}:{{ "%02d" % (limit % 60) }}</b>
+    <div class="tbar"><i id="tbar"></i></div>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <div class="tframe">
+    <div id="board" class="tboard" aria-label="Tabuleiro"></div>
+  </div>
+  <div id="tray" class="tray" aria-label="Peças"></div>
+
+  <div id="endbox" class="endbox" hidden>
+    <p id="endmsg"></p>
+    <button id="again" class="btn" type="button">Jogar de novo</button>
+    {% if not g.user %}
+    <p class="muted"><a href="{{ url_for('login') }}">Entre</a> ou <a href="{{ url_for('register') }}">crie uma conta</a> para guardar seus pontos e estatísticas.</p>
+    {% endif %}
+  </div>
+</section>
+
+<dialog id="tuto" class="modal">
+  <form method="dialog"><button class="x" aria-label="Fechar">&times;</button></form>
+  <h2>Como jogar Tetris</h2>
+  <ol>
+    <li>O tabuleiro tem <b>8x8</b> casas. Você recebe <b>3 peças</b> por vez. Quando usar as três, aparecem mais três.</li>
+    <li><b>Arraste</b> uma peça até o tabuleiro e solte onde ela couber. As peças <b>não podem ser giradas</b>.</li>
+    <li>Cada <b>linha ou coluna</b> preenchida some e vale <b>{{ "{:,}".format(line_points).replace(",", ".") }} pontos</b>. Completar várias de uma vez soma todas.</li>
+    <li>Você tem <b>{{ limit // 60 }} minutos</b>. O jogo também acaba se nenhuma peça restante couber no tabuleiro.</li>
+  </ol>
+  <h3>Pontuação no ranking</h3>
+  <p class="muted" style="margin:0 0 6px">Conforme os pontos que você fizer na partida:</p>
+  <table class="ptable">
+    <tr><td>Menos de 10.000</td><td>0 pts (derrota)</td></tr>
+    <tr><td>10.000 ou mais</td><td>10 pts</td></tr>
+    <tr><td>20.000 ou mais</td><td>25 pts</td></tr>
+    <tr><td>30.000 ou mais</td><td>50 pts</td></tr>
+    <tr><td>40.000 ou mais</td><td>75 pts</td></tr>
+    <tr><td>50.000 ou mais</td><td>100 pts</td></tr>
+  </table>
+  <p class="muted">Os pontos só são guardados para quem tem conta.</p>
+</dialog>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='tetris.js') }}"></script>{% endblock %}

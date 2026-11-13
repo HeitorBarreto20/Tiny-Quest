@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}{{ p.username }} · TinyQuest{% endblock %}
+{% macro medal(b) %}
+<div class="medal t{{ b.tier }}{{ '' if b.earned else ' locked' }}">
+  <span class="mi">{{ b.icon|safe }}</span>
+  <span class="pips">{% for _ in range(b.tier) %}<i></i>{% endfor %}</span>
+</div>
+{% endmacro %}
+{% block content %}
+<section class="phead card">
+  <div class="avatar">{{ p.username[0]|upper }}</div>
+  <div>
+    <h1>{{ p.username }}{% if is_me %} <small class="you">você</small>{% endif %}</h1>
+    <p class="muted">
+      {% if since %}Membro desde {{ since }}{% endif %}
+      {% if is_me %} &middot; {{ p.email }}{% endif %}
+    </p>
+  </div>
+  <div class="phead-count"><b>{{ earned }}/{{ total }}</b><span>emblemas</span></div>
+</section>
+
+<div class="tabs ptabs" id="ptabs" role="tablist">
+  <button class="tab on" data-p="stats" role="tab">Estatísticas</button>
+  <button class="tab" data-p="badges" role="tab">Emblemas</button>
+</div>
+
+<!-- Estatísticas dos mini-games -->
+<section id="panel-stats" class="panel">
+  <div class="sgrid">
+    {% for game in games %}
+    {% set s = game.stats %}
+    <article class="card scard">
+      <header>
+        <h3>{{ game.name }}</h3>
+        <a class="btn btn-ghost btn-sm" href="{{ url_for(game.endpoint) }}">Jogar</a>
+      </header>
+      <div class="bestscore">
+        <span>Maior pontuação</span>
+        <b>{{ s.best_score }}</b>
+      </div>
+      <div class="mini3">
+        <div><b>{{ s.points }}</b><span>Pontos totais</span></div>
+        <div><b>{{ s.wins }}</b><span>Vitórias</span></div>
+        <div><b>{{ s.played }}</b><span>Partidas</span></div>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- Emblemas -->
+<section id="panel-badges" class="panel" hidden>
+  <div class="tabs" id="badge-tabs">
+    <button class="tab on" data-f="all">Todos</button>
+    {% for gr in groups %}<button class="tab" data-f="{{ gr.key }}">{{ gr.name }}</button>{% endfor %}
+  </div>
+  {% for gr in groups %}
+  <div class="bgroup" data-g="{{ gr.key }}">
+    <div class="bgroup-head">
+      <h3>{{ gr.name }}</h3>
+      <span>{{ gr.earned }}/{{ gr.total }} conquistados</span>
+    </div>
+    <div class="badges">
+      {% for b in gr.badges %}
+      <div class="badge {{ 'earned' if b.earned else 'locked' }}">
+        {{ medal(b) }}
+        <div class="binfo">
+          <b>{{ b.name }}</b>
+          <span>{{ b.desc }}</span>
+          {% if b.earned %}
+            <em class="ok">Conquistado</em>
+          {% else %}
+            <div class="pbar"><i style="width: {{ b.pct }}%"></i></div>
+            <em>{{ b.current }}/{{ b.need }}</em>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+  (() => {
+    // Abas principais: Estatísticas / Emblemas (lembra pelo #emblemas na URL)
+    const ptabs = document.querySelectorAll('#ptabs .tab');
+    function showPanel(name) {
+      ptabs.forEach(t => t.classList.toggle('on', t.dataset.p === name));
+      document.getElementById('panel-stats').hidden = name !== 'stats';
+      document.getElementById('panel-badges').hidden = name !== 'badges';
+      history.replaceState(null, '', name === 'badges' ? '#emblemas' : location.pathname);
+    }
+    ptabs.forEach(t => t.addEventListener('click', () => showPanel(t.dataset.p)));
+    if (location.hash === '#emblemas') showPanel('badges');
+
+    // Filtro por jogo dentro dos emblemas
+    const tabs = document.querySelectorAll('#badge-tabs .tab');
+    const groups = document.querySelectorAll('.bgroup');
+    tabs.forEach(t => t.addEventListener('click', () => {
+      tabs.forEach(x => x.classList.toggle('on', x === t));
+      groups.forEach(g => { g.hidden = t.dataset.f !== 'all' && g.dataset.g !== t.dataset.f; });
+    }));
+  })();
+</script>
+{% endblock %}

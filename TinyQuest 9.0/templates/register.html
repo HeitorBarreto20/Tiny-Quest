@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Criar conta · TinyQuest{% endblock %}
+{% block content %}
+<form class="card form" method="post" autocomplete="on">
+  <h1>Criar conta</h1>
+  <label>Usuário
+    <input name="username" value="{{ username or '' }}" minlength="3" maxlength="20" pattern="[A-Za-z0-9_]+" required autofocus>
+  </label>
+  <label>E-mail
+    <input name="email" type="email" value="{{ email or '' }}" required>
+  </label>
+  <label>Senha
+    <input name="password" type="password" minlength="6" required>
+  </label>
+  <label>Confirmar senha
+    <input name="confirm" type="password" minlength="6" required>
+  </label>
+  <button class="btn" type="submit">Criar conta</button>
+  <p class="muted">Já tem conta? <a href="{{ url_for('login') }}">Entrar</a></p>
+</form>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Quem sou eu? · TinyQuest{% endblock %}
+{% block content %}
+<section class="quem">
+  <h1>Quem sou eu?</h1>
+  <p class="muted">Descubra o famoso com até {{ max_hints }} dicas. A cada erro, uma nova dica aparece.</p>
+  <button class="btn btn-ghost btn-sm" type="button" data-open="tuto">Como jogar</button>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <div><span class="chip" id="category"></span></div>
+  <div class="progress" id="progress"></div>
+  <ol class="hints" id="hints"></ol>
+
+  <form id="form" class="guessform" autocomplete="off">
+    <input id="guess" type="text" placeholder="Digite o nome do famoso" maxlength="80" aria-label="Seu palpite" autofocus>
+    <button class="btn" type="submit">Chutar</button>
+  </form>
+  <div id="wrong" class="wrong" aria-label="Palpites errados"></div>
+
+  <div id="endbox" class="endbox" hidden>
+    <p id="endmsg"></p>
+    <p class="answer" id="answer"></p>
+    <button id="again" class="btn" type="button">Jogar de novo</button>
+    {% if not g.user %}
+    <p class="muted"><a href="{{ url_for('login') }}">Entre</a> ou <a href="{{ url_for('register') }}">crie uma conta</a> para guardar seus pontos e estatísticas.</p>
+    {% endif %}
+  </div>
+</section>
+
+<dialog id="tuto" class="modal">
+  <form method="dialog"><button class="x" aria-label="Fechar">&times;</button></form>
+  <h2>Como jogar Quem sou eu?</h2>
+  <ol>
+    <li>Aparece uma <b>dica</b> sobre um famoso. Digite o nome dele e aperte <b>Enter</b> (ou clique em Chutar).</li>
+    <li>Se errar, uma <b>nova dica</b> é liberada. São no máximo <b>5 dicas</b>.</li>
+    <li>Errou depois da 5ª dica? Você perde e o famoso é revelado.</li>
+  </ol>
+  <div class="note">
+    <b>Maiúsculas e minúsculas não importam.</b>
+    Escrever <b>pelé</b>, <b>PELÉ</b> ou <b>Pelé</b> vale do mesmo jeito. O que importa é o nome estar escrito certo.
+    Acentos, espaços extras e pontos também são ignorados (<b>jk rowling</b> vale para J. K. Rowling).
+  </div>
+  <h3>Pontuação</h3>
+  <table class="ptable">
+    <tr><td>Acertou na 1ª dica</td><td>100 pts</td></tr>
+    <tr><td>Acertou na 2ª dica</td><td>80 pts</td></tr>
+    <tr><td>Acertou na 3ª dica</td><td>60 pts</td></tr>
+    <tr><td>Acertou na 4ª dica</td><td>40 pts</td></tr>
+    <tr><td>Acertou na 5ª dica</td><td>20 pts</td></tr>
+    <tr><td>Não acertou</td><td>0 pts</td></tr>
+  </table>
+  <p class="muted">Os pontos só são guardados para quem tem conta.</p>
+</dialog>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='quem.js') }}"></script>{% endblock %}

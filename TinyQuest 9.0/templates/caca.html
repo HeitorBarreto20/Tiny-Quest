@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Caça-Palavras · TinyQuest{% endblock %}
+{% block content %}
+<section class="caca">
+  <h1>Caça-Palavras</h1>
+  <p class="muted">Ache as {{ count }} palavras antes que o tempo acabe.</p>
+  <button class="btn btn-ghost btn-sm" type="button" data-open="tuto">Como jogar</button>
+
+  <div class="timer" id="timer">
+    <b id="time">{{ limit // 60 }}:{{ "%02d" % (limit % 60) }}</b>
+    <div class="tbar"><i id="tbar"></i></div>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <div class="cacagrid">
+    <div class="gridwrap">
+      <div id="grid" class="cgrid" aria-label="Tabuleiro"></div>
+      <div class="actions">
+        <button id="check" class="btn" type="button">Checar</button>
+        <button id="clear" class="btn btn-ghost" type="button">Limpar</button>
+      </div>
+    </div>
+    <aside class="card wordbox">
+      <h3>Palavras <small id="count">0/{{ count }}</small></h3>
+      <ul id="words"></ul>
+    </aside>
+  </div>
+
+  <div id="endbox" class="endbox" hidden>
+    <p id="endmsg"></p>
+    <button id="again" class="btn" type="button">Jogar de novo</button>
+    {% if not g.user %}
+    <p class="muted"><a href="{{ url_for('login') }}">Entre</a> ou <a href="{{ url_for('register') }}">crie uma conta</a> para guardar seus pontos e estatísticas.</p>
+    {% endif %}
+  </div>
+</section>
+
+<dialog id="tuto" class="modal">
+  <form method="dialog"><button class="x" aria-label="Fechar">&times;</button></form>
+  <h2>Como jogar Caça-Palavras</h2>
+  <ol>
+    <li>O tabuleiro tem <b>{{ size }}x{{ size }}</b> letras e <b>{{ count }} palavras</b> escondidas. A lista de palavras fica ao lado.</li>
+    <li>As palavras estão na <b>horizontal</b> (da esquerda para a direita), na <b>vertical</b> (de cima para baixo) ou na <b>diagonal</b> (descendo para a direita). Nunca de trás para frente.</li>
+    <li>Ao achar uma palavra, <b>selecione todas as letras</b> dela: clique nas letras ou arraste o dedo/mouse sobre elas.</li>
+    <li>Aperte <b>Checar</b>. Se estiver certo, a palavra fica marcada na lista.</li>
+    <li>Ache todas as palavras em até <b>{{ limit // 60 }} minutos</b>. O tempo começa assim que o tabuleiro aparece.</li>
+  </ol>
+  <h3>Pontuação</h3>
+  <table class="ptable">
+    <tr><td>Menos de 1 minuto</td><td>100 pts</td></tr>
+    <tr><td>Até 1 minuto e 30 segundos</td><td>75 pts</td></tr>
+    <tr><td>Até 2 minutos</td><td>50 pts</td></tr>
+    <tr><td>Depois de 2 minutos (até o fim do tempo)</td><td>25 pts</td></tr>
+    <tr><td>Tempo esgotado</td><td>0 pts</td></tr>
+  </table>
+  <p class="muted">Os pontos só são guardados para quem tem conta.</p>
+</dialog>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='caca.js') }}"></script>{% endblock %}

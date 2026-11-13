@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Ranking · TinyQuest{% endblock %}
+{% macro board(rows, key, mine, label, unit, one) %}
+<div class="card rank">
+  <h3>{{ label }}</h3>
+  {% if rows %}
+  <table>
+    {% for r in rows %}
+    <tr class="{{ 'me' if r.id == me else '' }} p{{ r.pos if r.pos <= 3 else 0 }}">
+      <td class="pos">{{ r.pos }}</td>
+      <td class="who"><a href="{{ url_for('player', username=r.username) }}">{{ r.username }}</a></td>
+      <td class="val">{{ r[key] }} <small>{{ one if r[key] == 1 else unit }}</small></td>
+    </tr>
+    {% endfor %}
+    {% if mine and mine.pos > top %}
+    <tr class="me gap"><td class="pos">{{ mine.pos }}</td>
+      <td class="who"><a href="{{ url_for('player', username=mine.username) }}">{{ mine.username }}</a></td>
+      <td class="val">{{ mine[key] }} <small>{{ one if mine[key] == 1 else unit }}</small></td></tr>
+    {% endif %}
+  </table>
+  {% else %}
+  <p class="muted">Ninguém pontuou ainda. Seja o primeiro!</p>
+  {% endif %}
+</div>
+{% endmacro %}
+{% block content %}
+<section class="ranking">
+  <h1>Ranking</h1>
+  <p class="muted">Classificação global entre jogadores com conta. Clique em um nome para ver o perfil.</p>
+  <div class="tabs">
+    {% for k in kinds %}
+    <a class="tab {{ 'on' if k.kind == cur.kind else '' }}" href="{{ url_for('ranking_page', jogo=k.kind) }}">{{ k.name }}</a>
+    {% endfor %}
+  </div>
+  <div class="rank-grid">
+    {{ board(by_pts, 'pts', my_pts, 'Mais pontos', 'pts', 'pt') }}
+    {{ board(by_wins, 'wins', my_wins, 'Mais vitórias', 'vitórias', 'vitória') }}
+  </div>
+  {% if not me %}<p class="muted center"><a href="{{ url_for('register') }}">Crie uma conta</a> para entrar no ranking.</p>{% endif %}
+</section>
+{% endblock %}

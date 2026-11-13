@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}Código Robótico · TinyQuest{% endblock %}
+{% block content %}
+<!-- Peças desenhadas em SVG (usadas pelo tabuleiro) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="bodyg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f7fb"/><stop offset="1" stop-color="#9fb0c8"/></linearGradient>
+    <linearGradient id="visg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#16243a"/><stop offset="1" stop-color="#0a111c"/></linearGradient>
+    <radialGradient id="eyeg"><stop offset="0" stop-color="#d9fdff"/><stop offset="1" stop-color="#34d8ec"/></radialGradient>
+    <linearGradient id="flagpole" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#e9e0d8"/><stop offset="1" stop-color="#8d8279"/></linearGradient>
+  </defs>
+
+  <!-- Parede de tijolos -->
+  <symbol id="brick" viewBox="0 0 100 100">
+    <rect width="100" height="100" rx="8" fill="#2c120f"/>
+    <g>
+      <rect x="3" y="4" width="45" height="21" rx="3" fill="#c4533a"/><rect x="52" y="4" width="45" height="21" rx="3" fill="#b34630"/>
+      <rect x="-20" y="29" width="43" height="21" rx="3" fill="#b34630"/><rect x="27" y="29" width="46" height="21" rx="3" fill="#c9583e"/><rect x="77" y="29" width="43" height="21" rx="3" fill="#b34630"/>
+      <rect x="3" y="54" width="45" height="21" rx="3" fill="#bd4b33"/><rect x="52" y="54" width="45" height="21" rx="3" fill="#c4533a"/>
+      <rect x="-20" y="79" width="43" height="19" rx="3" fill="#c4533a"/><rect x="27" y="79" width="46" height="19" rx="3" fill="#b34630"/><rect x="77" y="79" width="43" height="19" rx="3" fill="#c4533a"/>
+    </g>
+    <g fill="#ffffff" opacity=".16">
+      <rect x="5" y="5" width="41" height="4" rx="2"/><rect x="54" y="5" width="41" height="4" rx="2"/>
+      <rect x="29" y="30" width="42" height="4" rx="2"/><rect x="5" y="55" width="41" height="4" rx="2"/><rect x="54" y="55" width="41" height="4" rx="2"/><rect x="29" y="80" width="42" height="4" rx="2"/>
+    </g>
+    <rect width="100" height="100" rx="8" fill="none" stroke="#000" stroke-opacity=".45" stroke-width="3"/>
+  </symbol>
+
+  <!-- Robô visto de cima: a seta aponta para a frente (para cima) -->
+  <symbol id="robot" viewBox="0 0 100 100">
+    <polygon points="50,3 64,21 36,21" fill="#ff7d9d" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/>
+    <rect x="12" y="26" width="15" height="58" rx="7" fill="#1b2029" stroke="#3a4352" stroke-width="2"/>
+    <rect x="73" y="26" width="15" height="58" rx="7" fill="#1b2029" stroke="#3a4352" stroke-width="2"/>
+    <g stroke="#3a4352" stroke-width="2"><path d="M14 38h11M14 50h11M14 62h11M14 74h11M75 38h11M75 50h11M75 62h11M75 74h11"/></g>
+    <rect x="22" y="26" width="56" height="58" rx="16" fill="url(#bodyg)" stroke="#5b6b83" stroke-width="2.5"/>
+    <rect x="30" y="32" width="40" height="22" rx="9" fill="url(#visg)" stroke="#2a3a55" stroke-width="2"/>
+    <circle cx="41" cy="43" r="5.5" fill="url(#eyeg)"/><circle cx="59" cy="43" r="5.5" fill="url(#eyeg)"/>
+    <circle cx="39.5" cy="41.5" r="1.6" fill="#fff"/><circle cx="57.5" cy="41.5" r="1.6" fill="#fff"/>
+    <circle cx="50" cy="69" r="7" fill="#b92448" stroke="#7d1230" stroke-width="2"/>
+    <circle cx="50" cy="69" r="2.6" fill="#ffd1de"/>
+  </symbol>
+
+  <!-- ícones dos botões -->
+  <symbol id="i-left" viewBox="0 0 24 24"><path d="M9 7 4 12l5 5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 12h9a6 6 0 0 1 6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="m15 7 5 5-5 5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 12h-9a6 6 0 0 0-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol>
+  <symbol id="i-go" viewBox="0 0 24 24"><path d="M12 20V5M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
+
+<section class="robo">
+  <h1>Código Robótico</h1>
+  <p class="muted">Dê comandos ao robô para ele chegar à bandeira sem bater.</p>
+  <button class="btn btn-ghost btn-sm" type="button" data-open="tuto">Como jogar</button>
+
+  <div class="rhud">
+    <div class="phase" id="phase">Fase 1 de 3</div>
+    <div class="hits" id="hits" aria-label="Batidas"></div>
+  </div>
+
+  <div class="facing" id="facing" role="status">
+    <svg viewBox="0 0 24 24" class="farrow" id="farrow"><use href="#i-go"/></svg>
+    <span id="ftext"></span>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <div class="rwrap"><div id="rboard" class="rboard"></div></div>
+
+  <div class="program" id="program" aria-label="Seus comandos"></div>
+
+  <div class="rcontrols">
+    <button class="cmd" data-c="E" type="button"><svg viewBox="0 0 24 24"><use href="#i-left"/></svg><span>Esquerda</span></button>
+    <button class="cmd go" data-c="A" type="button"><svg viewBox="0 0 24 24"><use href="#i-go"/></svg><span>Andar</span></button>
+    <button class="cmd" data-c="D" type="button"><svg viewBox="0 0 24 24"><use href="#i-right"/></svg><span>Direita</span></button>
+  </div>
+  <div class="ractions">
+    <button id="run" class="btn" type="button">Executar</button>
+    <button id="erase" class="btn btn-ghost" type="button">Apagar</button>
+  </div>
+
+  <div id="endbox" class="endbox" hidden>
+    <p id="endmsg"></p>
+    <button id="again" class="btn" type="button">Jogar de novo</button>
+    {% if not g.user %}
+    <p class="muted"><a href="{{ url_for('login') }}">Entre</a> ou <a href="{{ url_for('register') }}">crie uma conta</a> para guardar seus pontos e estatísticas.</p>
+    {% endif %}
+  </div>
+</section>
+
+<dialog id="tuto" class="modal">
+  <form method="dialog"><button class="x" aria-label="Fechar">&times;</button></form>
+  <h2>Como jogar Código Robótico</h2>
+  <ol>
+    <li>Leve o robô até a <b>bandeira quadriculada</b> sem esbarrar nas <b>paredes</b> nem sair do tabuleiro.</li>
+    <li>Monte uma lista de comandos:
+      <ul class="cmds">
+        <li><b>Esquerda</b>: gira o robô para a esquerda (sem sair do lugar).</li>
+        <li><b>Direita</b>: gira o robô para a direita (sem sair do lugar).</li>
+        <li><b>Andar</b>: anda uma casa para a frente, na direção em que ele está virado.</li>
+        <li><b>Apagar</b>: apaga todos os comandos. Clicar em um comando da lista remove só ele.</li>
+      </ul>
+    </li>
+    <li>No começo de cada fase, o aviso no topo mostra <b>para onde o robô está virado</b>. A seta rosa no robô também aponta a frente dele.</li>
+    <li>Aperte <b>Executar</b>. Se o robô bater numa parede ou na borda, conta uma <b>batida</b> e ele volta ao início da fase (seus comandos continuam lá para você corrigir).</li>
+    <li>São <b>3 fases</b>: fácil, média e difícil. As batidas se acumulam. Com <b>4 batidas</b> você perde.</li>
+  </ol>
+  <h3>Pontuação</h3>
+  <table class="ptable">
+    <tr><td>Nenhuma batida</td><td>100 pts</td></tr>
+    <tr><td>1 batida</td><td>75 pts</td></tr>
+    <tr><td>2 batidas</td><td>50 pts</td></tr>
+    <tr><td>3 batidas</td><td>25 pts</td></tr>
+    <tr><td>4 batidas (derrota)</td><td>0 pts</td></tr>
+  </table>
+  <p class="muted">Os pontos só são guardados para quem tem conta.</p>
+</dialog>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='robo.js') }}"></script>{% endblock %}

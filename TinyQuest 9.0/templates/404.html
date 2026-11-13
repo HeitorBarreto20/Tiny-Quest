@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Não encontrado · TinyQuest{% endblock %}
+{% block content %}
+<section class="card form" style="text-align:center">
+  <h1>Página não encontrada</h1>
+  <p class="muted">Esse jogador ou página não existe.</p>
+  <a class="btn" href="{{ url_for('index') }}">Voltar ao início</a>
+</section>
+{% endblock %}

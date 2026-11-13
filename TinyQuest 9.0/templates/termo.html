@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Termo · TinyQuest{% endblock %}
+{% block content %}
+<section class="termo" data-logged="{{ 1 if g.user else 0 }}">
+  <h1>Termo</h1>
+  <p class="muted">Descubra a palavra de {{ word_len }} letras em {{ max_tries }} tentativas.</p>
+  <button class="btn btn-ghost btn-sm" type="button" data-open="tuto">Como jogar</button>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <div id="board" class="board" aria-label="Tabuleiro"></div>
+
+  <div id="endbox" class="endbox" hidden>
+    <p id="endmsg"></p>
+    <button id="again" class="btn" type="button">Jogar de novo</button>
+    {% if not g.user %}
+    <p class="muted"><a href="{{ url_for('login') }}">Entre</a> ou <a href="{{ url_for('register') }}">crie uma conta</a> para guardar seus pontos e estatísticas.</p>
+    {% endif %}
+  </div>
+
+  <div id="keyboard" class="keyboard" aria-label="Teclado"></div>
+</section>
+
+<dialog id="tuto" class="modal">
+  <form method="dialog"><button class="x" aria-label="Fechar">&times;</button></form>
+  <h2>Como jogar Termo</h2>
+  <ol>
+    <li>Há uma palavra secreta de <b>5 letras</b>. Você tem <b>6 tentativas</b> para descobri-la.</li>
+    <li>Digite uma palavra de 5 letras (no teclado do computador ou no teclado da tela) e aperte <b>Enter</b>.</li>
+    <li>Cada letra ganha uma cor:
+      <ul class="legend">
+        <li><span class="sw c"></span><b>Verde</b>: letra certa no lugar certo.</li>
+        <li><span class="sw p"></span><b>Amarela</b>: a letra existe, mas em outro lugar.</li>
+        <li><span class="sw a"></span><b>Cinza</b>: a letra não está na palavra.</li>
+      </ul>
+    </li>
+    <li>Não precisa digitar acentos: <b>acao</b> vale para <b>ação</b>.</li>
+  </ol>
+  <h3>Pontuação</h3>
+  <table class="ptable">
+    <tr><td>Acertou em até 4 tentativas</td><td>100 pts</td></tr>
+    <tr><td>Acertou na 5ª tentativa</td><td>66 pts</td></tr>
+    <tr><td>Acertou na última tentativa (6ª)</td><td>33 pts</td></tr>
+    <tr><td>Não acertou</td><td>0 pts</td></tr>
+  </table>
+  <p class="muted">Os pontos só são guardados para quem tem conta.</p>
+</dialog>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='termo.js') }}"></script>{% endblock %}
